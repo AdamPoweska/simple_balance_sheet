@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0">
+    <title>Trial Balance</title>
+    <style>
+        table { 
+        border-collapse: collapse; 
+        width: 100%; 
+    }
+
+        th, td { 
+        border: 1px solid #ddd; 
+        padding: 8px; 
+        text-align: left; 
+    }
+        th { 
+        background-color: #f4f4f4; 
+    }
+    
+    </style>
+</head>
+
+<body>
+
+<h1>Trial Balance</h1>
+<p>Simple Trial Balance - only Fixed and Current assets</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Opening Balance</th>
+            <th>Activity</th>
+            <th>Closing Balance</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in trial_balance_data %}
+            <tr>
+                <td>{{ record.account_name }}</td>
+                <td>{{ record.account_number }}</td>
+                <td>{{ record.opening_balance }}</td>
+                <td>{{ record.activity }}</td>
+                <td>{{ record.closing_balance }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<a href="{% url 'user_form' %}">Form</a>
+
+
+</body>
+</html>
