@@ -1,10 +1,32 @@
 <html>
+<head>
+    <title>Trial Balance</title>
+</head>
 <body>
-
-<h1>Hello World!</h1>
-<p>Welcome to my first Django project!</p>
-
-
-
+    <center>
+        <br>
+        <br>
+        <FONT FACE="Courier New">
+            <h1>Simple Trial Balance</h1>
+        </FONT>
+        <br>
+        <br>
+        <form method="get" action="{% url 'user_login' %}">
+            {% csrf_token %}
+            <button type="submit">Zaloguj</button>
+        </form>
+        <br>
+        <form method="get" action="{% url 'user_registration' %}">
+            {% csrf_token %}
+            <button type="submit">Zarejestruj</button>
+        </form>
+        <br>
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'user_logout' %}">
+            {% csrf_token %}
+            <button type="submit">Log out</button>
+        </form>
+        {% endif %}
+    </center>
 </body>
 </html>

@@ -5,17 +5,46 @@ from django.template import loader
 from django.views.generic.edit import FormView, CreateView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, TemplateView, ListView, UpdateView
+from django.contrib.auth import login
+from django.contrib.auth.views import LoginView, LogoutView
 
 from .forms import *
 
-def hello_view(request):
-    template = loader.get_template('first_hello.html')
-    return HttpResponse(template.render())
+# def hello_view(request):
+#     template = loader.get_template('first_hello.html')
+#     return HttpResponse(template.render())
+
+class HelloView(TemplateView):
+    template_name = 'first_hello.html'
+
+
+class UserLoginView(LoginView):
+    template_name = 'registration/user_login.html'
+    redirect_authenticated_user = True
+    success_url = reverse_lazy('trial_balance')
+
+
+class UserLogoutView(LogoutView):
+    redirect_authenticated_user = True
+    success_url = 'first_hello'
+
+
+class UserRegisterView(FormView):
+    template_name = 'registration/user_registration.html'
+    form_class = NewUserForm
+    success_url = reverse_lazy('trial_balance')
+
+    def form_valid(self, form):
+        user = form.save() # zapisanie użytkownika, FormView nie robi tego automatycznie
+        login(self.request, user) # zalogowanie użytkownika
+        return super().form_valid(form)
+
 
 class AccountCreateView(CreateView):
     template_name = 'user_form.html'
     form_class = TrialBalanceForm
     success_url = reverse_lazy('trial_balance')
+
 
 class TrialBalanceListView(ListView):
     model = SimpleTrialBalance
