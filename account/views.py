@@ -54,6 +54,24 @@ class AccountDeleteView(FormView):
         return redirect('trial_balance')
 
 
+class AccountUpdateSelectView(FormView):
+    template_name = 'account_update_select.html'
+    form_class = AccountUpdateSelect
+    
+    def form_valid(self, form):
+        selected_account = form.cleaned_data['account_update_select']
+        return redirect('update_account', pk=selected_account.pk)
+
+
+class AccountUpdateView(UpdateView):
+    model = SimpleTrialBalance
+    form_class = TrialBalanceForm
+    template_name = 'update_account.html'
+
+    def get_success_url(self):
+        return reverse_lazy('trial_balance')
+
+
 class ParentViewTrialBalance(TemplateView):
     template_name = 'trial_balance.html'
 
@@ -65,11 +83,17 @@ class ParentViewTrialBalance(TemplateView):
         context['dropdown_list_main'] = [
             {'name': 'Add account', 'class': 'AccountCreateView'},
             {'name': 'Delete account', 'class': 'AccountDeleteView'},
+            {'name': 'Update account', 'class': 'AccountUpdateSelectView'},
         ]
         return context
     
     def get(self, request, *args, **kwargs):
         action = request.GET.get('action')
+
         if action == 'AccountDeleteView':
             return redirect('delete_account')
+        elif action == 'AccountUpdateSelectView':
+            return redirect('account_update_select')
+        elif action == 'AccountCreateView':
+            return redirect('user_form')
         return super().get(request, *args, **kwargs)
