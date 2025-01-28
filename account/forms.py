@@ -21,3 +21,11 @@ class NewUserForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+
+
+class AccountDeleteForm(forms.Form):
+    accounts_to_delete = forms.ModelMultipleChoiceField(
+        queryset=SimpleTrialBalance.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )

@@ -1,5 +1,5 @@
 # Create your views here.
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.views.generic.edit import FormView, CreateView
@@ -11,9 +11,6 @@ from django.contrib.auth.views import LoginView, LogoutView
 from .forms import *
 from .models import *
 
-# def hello_view(request):
-#     template = loader.get_template('first_hello.html')
-#     return HttpResponse(template.render())
 
 class HelloView(TemplateView):
     template_name = 'first_hello.html'
@@ -47,24 +44,15 @@ class AccountCreateView(CreateView):
     success_url = reverse_lazy('trial_balance')
 
 
-# class TrialBalanceListView(ListView):
-#     model = SimpleTrialBalance
-#     template_name = 'trial_balance.html'
-#     context_object_name = 'trial_balance_data' # dane przekazywane do kontekstu pod nazwą 'trial_balance_data'
+class AccountDeleteView(FormView):
+    template_name = 'delete_account.html'
+    form_class = AccountDeleteForm
 
+    def form_valid(self, form):
+        accounts_to_delete = form.cleaned_data['accounts_to_delete']
+        accounts_to_delete.delete()
+        return redirect('trial_balance')
 
-class FormsDropdownList(TemplateView):
-    template_name = 'trial_balance.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context['dropdown_list_main'] = [ # dane przekazywane do kontekstu pod nazwą 'dropdown_list_main'
-            {'name': 'Add account', 'class': 'TrialBalanceForm'}
-        ]
-
-        return context
-    
 
 class ParentViewTrialBalance(TemplateView):
     template_name = 'trial_balance.html'
@@ -75,6 +63,13 @@ class ParentViewTrialBalance(TemplateView):
         context['trial_balance_data'] = SimpleTrialBalance.objects.all() 
         # dropdown:
         context['dropdown_list_main'] = [
-            {'name': 'Add account','class': 'TrialBalanceForm'}
+            {'name': 'Add account', 'class': 'AccountCreateView'},
+            {'name': 'Delete account', 'class': 'AccountDeleteView'},
         ]
         return context
+    
+    def get(self, request, *args, **kwargs):
+        action = request.GET.get('action')
+        if action == 'AccountDeleteView':
+            return redirect('delete_account')
+        return super().get(request, *args, **kwargs)

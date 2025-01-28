@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0">
+    <title>Delete Accounts</title>
+</head>
+<body>
+    <h1>Select accounts to delete</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Delete Selected Accounts</button>
+    </form>
+</body>
+</html>

@@ -11,3 +11,6 @@ class SimpleTrialBalance(models.Model):
     def save(self, *args, **kwargs): # nadpisanie metody save, spowoduje zapisanie closing_blanace w bazie danych
         self.closing_balance = self.opening_balance + self.activity
         super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.account_name} | {self.account_number}"
