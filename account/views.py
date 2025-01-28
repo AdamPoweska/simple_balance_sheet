@@ -9,6 +9,7 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 
 from .forms import *
+from .models import *
 
 # def hello_view(request):
 #     template = loader.get_template('first_hello.html')
@@ -46,7 +47,34 @@ class AccountCreateView(CreateView):
     success_url = reverse_lazy('trial_balance')
 
 
-class TrialBalanceListView(ListView):
-    model = SimpleTrialBalance
+# class TrialBalanceListView(ListView):
+#     model = SimpleTrialBalance
+#     template_name = 'trial_balance.html'
+#     context_object_name = 'trial_balance_data' # dane przekazywane do kontekstu pod nazwą 'trial_balance_data'
+
+
+class FormsDropdownList(TemplateView):
     template_name = 'trial_balance.html'
-    context_object_name = 'trial_balance_data' # dane przekazywane do kontekstu
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['dropdown_list_main'] = [ # dane przekazywane do kontekstu pod nazwą 'dropdown_list_main'
+            {'name': 'Add account', 'class': 'TrialBalanceForm'}
+        ]
+
+        return context
+    
+
+class ParentViewTrialBalance(TemplateView):
+    template_name = 'trial_balance.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # pobieranie danych z MODELU
+        context['trial_balance_data'] = SimpleTrialBalance.objects.all() 
+        # dropdown:
+        context['dropdown_list_main'] = [
+            {'name': 'Add account','class': 'TrialBalanceForm'}
+        ]
+        return context

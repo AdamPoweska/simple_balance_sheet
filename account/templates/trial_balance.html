@@ -36,7 +36,6 @@
         </form>
     {% endif %}
 
-
     <FONT FACE="Courier New">
         <h1>Trial Balance</h1>
     </FONT>
@@ -65,8 +64,6 @@
         {% endfor %}
     </tbody>
 </table>
-
-
 <br>
 <br>
 <br>
@@ -77,6 +74,19 @@
 
 <a href="{% url 'user_form' %}">Form</a>
 
+<br>
+<br>
+<br>
+
+<p>Wybierz formularz</p>
+<form method="GET" action="{% url 'user_form' %}">
+    <select name="TrialBalanceForm">
+        {% for form in dropdown_list_main %}     
+            <option value="{{ form.class }}">{{ form.name }}</option>
+        {% endfor %}
+    </select>
+<button type="submit">Wybierz</button>
+</form>
 
 </body>
 </html>
