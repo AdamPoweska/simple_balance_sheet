@@ -1,6 +1,6 @@
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.template import loader
 from django.views.generic.edit import FormView, CreateView
 from django.urls import reverse_lazy
@@ -50,6 +50,11 @@ class AccountCreateView(CreateView):
 class AccountDeleteView(FormView):
     template_name = 'delete_account.html'
     form_class = AccountDeleteForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='all_permissions').exists(): # jeśli użytkownik nie należy do grupy 'all_permissions' to zwróci się na Httpresponse forbidden, jeśli jednak nim jest to dostanie standardową metodę dispatch
+            return HttpResponseForbidden("No access to delete form")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         accounts_to_delete = form.cleaned_data['accounts_to_delete']
