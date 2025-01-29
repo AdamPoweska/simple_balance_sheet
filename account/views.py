@@ -5,7 +5,8 @@ from django.template import loader
 from django.views.generic.edit import FormView, CreateView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, TemplateView, ListView, UpdateView
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.views import LoginView, LogoutView
 
 from .forms import *
@@ -34,6 +35,8 @@ class UserRegisterView(FormView):
 
     def form_valid(self, form):
         user = form.save() # zapisanie użytkownika, FormView nie robi tego automatycznie
+        user_group, _ = Group.objects.get_or_create(name="new_hire_permissions") # get_or_create() zwraca krotkę (group, created) _ oznacza, że ignorujemy drugą wartość (created, czyli czy grupa została utworzona).
+        user.groups.add(user_group) # nadanie nowemu użytkownikowi grupy new_hire_permissions - czyli podstawowe dostępy -> działa, jest wszystko w panelu admina
         login(self.request, user) # zalogowanie użytkownika
         return super().form_valid(form)
 
