@@ -1,4 +1,5 @@
 # Create your views here.
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.template import loader
@@ -46,6 +47,11 @@ class AccountCreateView(CreateView):
     form_class = TrialBalanceForm
     success_url = reverse_lazy('trial_balance')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.groups.filter(name='all_permissions').exists(): # jeśli użytkownik nie należy do grupy 'all_permissions' to zwróci się na Httpresponse forbidden, jeśli jednak nim jest to dostanie standardową metodę dispatch
+            raise PermissionDenied # django w ten sposób przekieruje do 403.html zapisanego w tamples (nadpisanego)
+        return super().dispatch(request, *args, **kwargs)
+
 
 class AccountDeleteView(FormView):
     template_name = 'delete_account.html'
@@ -53,7 +59,7 @@ class AccountDeleteView(FormView):
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.groups.filter(name='all_permissions').exists(): # jeśli użytkownik nie należy do grupy 'all_permissions' to zwróci się na Httpresponse forbidden, jeśli jednak nim jest to dostanie standardową metodę dispatch
-            return HttpResponseForbidden("No access to delete form")
+            raise PermissionDenied # django w ten sposób przekieruje do 403.html zapisanego w tamples (nadpisanego)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -78,6 +84,11 @@ class AccountUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('trial_balance')
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user # przekazujemy użytkownika do formularza
+        return kwargs
 
 
 class ParentViewTrialBalance(TemplateView):

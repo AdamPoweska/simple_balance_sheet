@@ -14,6 +14,15 @@ class TrialBalanceForm(forms.ModelForm):
         model = SimpleTrialBalance
         exclude = ['closing_balance'] # wykluczenie closing_balance w formularzu, użytkownik nie będzie miał do niego dostępu i przypadkiem go nie nadpisze
 
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        if user.groups.filter(name='new_hire_permissions').exists():
+            # self.fields['account_name', 'account_number', 'opening_balance'].widget = forms.HiddenInput() # ukrycie określonych pól jeśli użytkownik jest w grupie 'new_hire_permissions"
+            self.fields['account_name'].disabled = True # w ten sposób możemy zablokować pole do edycji ale jest odczyt
+            self.fields['account_number'].disabled = True # nie możemy przekazać wszytkiego naraz bo django nie obłuży dostępu do wielu pól jednocześnie w liście
+            self.fields['opening_balance'].disabled = True
 
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
