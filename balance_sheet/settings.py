@@ -126,3 +126,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = "/trial_balance/"
 LOGOUT_REDIRECT_URL = reverse_lazy('first_hello')
+
+# password reset
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # wyświetlenie emaila w terminalu zamiast wysyłać go naprawdę
+
+# Sending real email for password reset
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # Jeśli używasz Gmaila
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = '****@gmail.com'
+# EMAIL_HOST_PASSWORD = '****'
+# DEFAULT_FROM_EMAIL = '****@gmail.com'
+
+LOGIN_URL = '/login/'

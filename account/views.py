@@ -19,7 +19,7 @@ class HelloView(TemplateView):
 
 
 class UserLoginView(LoginView):
-    template_name = 'registration/user_login.html'
+    template_name = 'registration/login.html'
     redirect_authenticated_user = True
     success_url = reverse_lazy('trial_balance')
 
@@ -51,6 +51,11 @@ class AccountCreateView(CreateView):
         if not request.user.groups.filter(name='all_permissions').exists(): # jeśli użytkownik nie należy do grupy 'all_permissions' to zwróci się na Httpresponse forbidden, jeśli jednak nim jest to dostanie standardową metodę dispatch
             raise PermissionDenied # django w ten sposób przekieruje do 403.html zapisanego w tamples (nadpisanego)
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user # przekazujemy użytkownika do formularza
+        return kwargs
 
 
 class AccountDeleteView(FormView):
