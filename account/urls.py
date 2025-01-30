@@ -14,7 +14,7 @@ urlpatterns = [
     path('account_update_select/', views.AccountUpdateSelectView.as_view(), name='account_update_select'),
     path('update_account/<int:pk>/', views.AccountUpdateView.as_view(), name='update_account'),
     # do resetowania hasła - gotowe widoki już istniejące w django
-    path('reset_password/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('reset_password//', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),

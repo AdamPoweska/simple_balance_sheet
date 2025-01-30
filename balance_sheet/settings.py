@@ -56,7 +56,10 @@ ROOT_URLCONF = 'balance_sheet.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates', # dodanie ścieżki do katalogu żeby django nie korzystał z własnych temates
+            BASE_DIR / 'account' / 'templates', # dodanie kolejnej ścieżki, żeby brał też pod uwagę te templates - do resetowania hasła
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
