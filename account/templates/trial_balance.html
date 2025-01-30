@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0">
-    <title>Trial Balance</title>
+    <title>Simple Trial Balance</title>
     <style>
         table { 
         border-collapse: collapse; 
@@ -30,6 +30,7 @@
 
 <body>
     {% if user.is_authenticated %}
+        <p> Zalogowano: {{ user.username }}</p>
         <form method="POST" action="{% url 'user_logout' %}" class="right-button">
             {% csrf_token %}
             <button type="submit">Log out</button>
@@ -37,7 +38,7 @@
     {% endif %}
 
     <FONT FACE="Courier New">
-        <h1>Trial Balance</h1>
+        <h1>Simple Trial Balance</h1>
     </FONT>
     <FONT FACE="Arial">
         <p>Simple Trial Balance - only Fixed and Current assets</p>
