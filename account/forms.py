@@ -14,9 +14,9 @@ class TrialBalanceForm(forms.ModelForm):
         model = SimpleTrialBalance
         exclude = ['closing_balance'] # wykluczenie closing_balance w formularzu, użytkownik nie będzie miał do niego dostępu i przypadkiem go nie nadpisze
 
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs): # init jest wywoływana za każdym razem gdy jest tworzony obiekt klasy
+        user = kwargs.pop('user', None) # Funkcja pop wyciąga z argumentów kwargs wartość dla klucza 'user' i przypisuje ją do zmiennej user, jeśli klucz 'user' nie istnieje w kwargs, to domyślną wartością będzie None.
+        super().__init__(*args, **kwargs) #nadpisanie __init__
 
         if user.groups.filter(name='new_hire_permissions').exists():
             # self.fields['account_name', 'account_number', 'opening_balance'].widget = forms.HiddenInput() # ukrycie określonych pól jeśli użytkownik jest w grupie 'new_hire_permissions"
