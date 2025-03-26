@@ -14,3 +14,6 @@ class SimpleTrialBalance(models.Model):
     
     def __str__(self):
         return f"{self.account_name} | {self.account_number}"
+    
+    def __repr__(self):
+        return f"{self.account_name} | {self.account_number} | {self.opening_balance} | {self.activity} | {self.closing_balance}"
