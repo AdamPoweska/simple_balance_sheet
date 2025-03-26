@@ -18,7 +18,7 @@ class TrialBalanceForm(forms.ModelForm):
         user = kwargs.pop('user', None) # Funkcja pop wyciąga z argumentów kwargs wartość dla klucza 'user' i przypisuje ją do zmiennej user, jeśli klucz 'user' nie istnieje w kwargs, to domyślną wartością będzie None.
         super().__init__(*args, **kwargs) #nadpisanie __init__
 
-        if user.groups.filter(name='new_hire_permissions').exists():
+        if user and user.groups.filter(name='new_hire_permissions').exists():
             # self.fields['account_name', 'account_number', 'opening_balance'].widget = forms.HiddenInput() # ukrycie określonych pól jeśli użytkownik jest w grupie 'new_hire_permissions"
             self.fields['account_name'].disabled = True # w ten sposób możemy zablokować pole do edycji ale jest odczyt
             self.fields['account_number'].disabled = True # nie możemy przekazać wszytkiego naraz bo django nie obłuży dostępu do wielu pól jednocześnie w liście
