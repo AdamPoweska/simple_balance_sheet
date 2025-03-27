@@ -33,7 +33,7 @@ class NewUserForm(UserCreationForm):
 
 
 class AccountDeleteForm(forms.Form):
-    accounts_to_delete = forms.ModelMultipleChoiceField(
+    accounts_to_delete = forms.ModelMultipleChoiceField (
         queryset=SimpleTrialBalance.objects.all(),
         widget=forms.CheckboxSelectMultiple, # do wyboru wielu opcji
         required=False # nie trzeba nic zaznaczać, wtedy wrócimy do listy kont bez usuwania czegokolwiek
