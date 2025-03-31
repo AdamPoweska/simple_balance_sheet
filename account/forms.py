@@ -24,6 +24,7 @@ class TrialBalanceForm(forms.ModelForm):
             self.fields['account_number'].disabled = True # nie możemy przekazać wszytkiego naraz bo django nie obłuży dostępu do wielu pól jednocześnie w liście
             self.fields['opening_balance'].disabled = True
 
+
 class NewUserForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
@@ -33,7 +34,7 @@ class NewUserForm(UserCreationForm):
 
 
 class AccountDeleteForm(forms.Form):
-    accounts_to_delete = forms.ModelMultipleChoiceField (
+    accounts_to_delete = forms.ModelMultipleChoiceField(
         queryset=SimpleTrialBalance.objects.all(),
         widget=forms.CheckboxSelectMultiple, # do wyboru wielu opcji
         required=False # nie trzeba nic zaznaczać, wtedy wrócimy do listy kont bez usuwania czegokolwiek

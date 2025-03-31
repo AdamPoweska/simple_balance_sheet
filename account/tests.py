@@ -97,7 +97,6 @@ def test_trial_balance_form_3():
 def test_account_delete_form_1():
     # formularz gdzie nie przekazujemy żadnego konta, więc bedzie pusty
     form = AccountDeleteForm(data={})
-
     assert form.is_valid()
 
 @pytest.mark.django_db
@@ -256,7 +255,126 @@ def test_account_update_form_2():
     # wypełnienie formularza
     form = AccountUpdateSelect(data={'account_update_select': account_1.id})
 
-    # if not form.is_valid():
-    #     print(form.errors)
+    assert form.is_valid()
+
+@pytest.mark.django_db
+def test_account_update_form_3():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
 
     assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 100 | 100"
+
+@pytest.mark.django_db
+def test_account_update_form_4():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
+
+    assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__str__() == "account_1 | 30011"
+
+@pytest.mark.django_db
+def test_account_update_form_5():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
+
+    assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 100 | 100"
+
+    account_1.activity = 200
+    account_1.save()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 200 | 200"
+
+@pytest.mark.django_db
+def test_account_update_form_6():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
+
+    assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 100 | 100"
+
+    account_1.account_name = "account_2"
+    account_1.save()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_2 | 30011 | 0 | 100 | 100"
+
+@pytest.mark.django_db
+def test_account_update_form_7():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
+
+    assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 100 | 100"
+
+    account_1.account_number = "60020"
+    account_1.save()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 60020 | 0 | 100 | 100"
+
+@pytest.mark.django_db
+def test_account_update_form_8():
+    # stworzenie konta:
+    account_1 = SimpleTrialBalance.objects.create(
+        account_name = "account_1",
+        account_number = "30011",
+        opening_balance = 0,
+        activity = 100,
+    )
+
+    # wypełnienie formularza
+    form = AccountUpdateSelect(data={'account_update_select': account_1.id})
+
+    assert form.is_valid()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 0 | 100 | 100"
+
+    account_1.opening_balance = 50
+    account_1.save()
+
+    assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 50 | 100 | 150"
