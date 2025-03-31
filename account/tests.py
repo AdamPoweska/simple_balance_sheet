@@ -1,5 +1,6 @@
 import pytest
 from django.contrib.auth.models import User, Group
+from django.urls import reverse
 
 from .models import SimpleTrialBalance
 from .forms import *
@@ -378,3 +379,13 @@ def test_account_update_form_8():
     account_1.save()
 
     assert SimpleTrialBalance.objects.get(id=account_1.id).__repr__() == "account_1 | 30011 | 50 | 100 | 150"
+
+
+# Testy widoków
+@pytest.mark.django_db
+def test_first_hello(client): # client to specjalne narzędzie do testowania widoków: 'do symulowania żądań HTTP'
+    url = reverse("first_hello") #  URL jak w urls.py
+    response = client.get(url)
+
+    assert response.status_code == 200 # sprawdza czy strona się ładuje
+    assert "first_hello.html" in [x.name for x in response.templates] # sprawdza czy 'first_hello.html' został użyty
