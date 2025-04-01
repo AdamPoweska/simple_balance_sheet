@@ -384,8 +384,49 @@ def test_account_update_form_8():
 # Testy widoków
 @pytest.mark.django_db
 def test_first_hello(client): # client to specjalne narzędzie do testowania widoków: 'do symulowania żądań HTTP'
-    url = reverse("first_hello") #  URL jak w urls.py
+    url = reverse("first_hello") #  reverse() zmienia nazwę widoku (taki jak jest w urls.py) na odpowiadający jej url, podajemy nazwę taka jaka jest w urls.py > name=
     response = client.get(url)
 
     assert response.status_code == 200 # sprawdza czy strona się ładuje
-    assert "first_hello.html" in [x.name for x in response.templates] # sprawdza czy 'first_hello.html' został użyty
+    assert "first_hello.html" in [x.name for x in response.templates] # sprawdza czy szablon 'first_hello.html' - czyli czy używamy odpowiedniego szablonu
+
+@pytest.mark.django_db
+def test_user_login_view_1(client):
+    url = reverse("login")
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert "registration/login.html" in [t.name for t in response.templates]
+
+@pytest.mark.django_db
+def test_user_login_view_2(client, django_user_model):
+    # sprawdzamy czy wystąpi 302 - oczekiwanie na przekierowanie
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    client.login(username="user_1", password="pw1234") # logowanie użytkownika
+
+    url = reverse("login")
+    response = client.get(url)
+
+    assert response.status_code == 302 # 302 oznacza że zasób do o którego użytkownik próbuje uzyskać dostęp, został tymczasowo przeniesiony na nowy adres URL
+    assert response.url == reverse("trial_balance") # sprawdzamy czy przekierowanie działa ale nie podąża za nim automatycznie
+
+@pytest.mark.django_db
+def test_user_login_view_3(client, django_user_model):
+    # sprawdzamy czy użytkownik zostanie poprawnie przekierowoany po zalogowaniu
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True) # musimy użyc follow=, żeby sprawdzić czy użytkownik faktycznie został przekierowny po zalogowaniu
+
+    assert response.status_code == 200 #status po przekierowaniu
+    assert response.request["PATH_INFO"] == reverse("trial_balance") # czy użytkownik został poprawnie przekierowany na trail_balance
+
+@pytest.mark.django_db
+def test_user_login_view_4(client):
+    # test błędnego logowania
+    url = reverse("login")
+    response = client.post(url, {"username": "user_x", "password": "pwxxx"})
+
+    assert response.status_code == 200 # pozostajemy na stronie, nie ma przekierowania
+    error_message = "Please enter a correct username and password. Note that both fields may be case-sensitive."
+    assert error_message in response.content.decode() # uzyskanie dostępu do kodu html (pełna treść) w str
