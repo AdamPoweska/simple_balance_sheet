@@ -438,12 +438,30 @@ def test_user_logout_view(client, django_user_model):
 
     url = reverse("login")
     response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True) # musimy użyc follow=, żeby sprawdzić czy użytkownik faktycznie został przekierowny po zalogowaniu
-
+    
+    #zalogowanie
     assert response.status_code == 200 #status po przekierowaniu
     assert response.request["PATH_INFO"] == reverse("trial_balance") # czy użytkownik został poprawnie przekierowany na trail_balance
 
     url = reverse("user_logout")
     response = client.post(url, follow=True) #LogoutView działa na post
 
+    # wylogowanie
     assert response.status_code == 200 #status po przekierowaniu
-    assert response.request["PATH_INFO"] == reverse("first_hello") # czy użytkownik został poprawnie przekierowany na trail_balance
+    assert response.request["PATH_INFO"] == reverse("first_hello") # czy użytkownik został poprawnie przekierowany na first_hello
+
+@pytest.mark.django_db
+def test_user_register_view_1(client):
+    url = reverse("user_registration")
+    response = client.post(url, {
+        "username": "user_1", 
+        "email": "user_1@email.com", 
+        "password1": "P@ss!word1234", # hasło musi spełniać standardy django template
+        "password2": "P@ss!word1234",
+    }, follow=True)
+
+    user = User.objects.filter(username="user_1").first()
+
+    assert user is not None
+    assert user.email == "user_1@email.com"
+
