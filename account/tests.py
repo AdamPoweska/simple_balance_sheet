@@ -465,3 +465,34 @@ def test_user_register_view_1(client):
     assert user is not None
     assert user.email == "user_1@email.com"
 
+    print(user.groups.all())
+    assert user.groups.filter(name="new_hire_permissions").exists()
+
+@pytest.mark.django_db
+def test_user_register_view_2(client):
+    url = reverse("user_registration")
+    response = client.post(url, {
+        "username": "user_1", 
+        "email": "user_1@email.com", 
+        "password1": "P@ss!word1234", # hasło musi spełniać standardy django template
+        "password2": "P@ss!word1234",
+    }, follow=True)
+
+    user = User.objects.filter(username="user_1").first()
+
+    assert user.email == "user_1@email.com"
+
+@pytest.mark.django_db
+def test_user_register_view_3(client):
+    url = reverse("user_registration")
+    response = client.post(url, {
+        "username": "user_1", 
+        "email": "user_1@email.com", 
+        "password1": "P@ss!word1234", # hasło musi spełniać standardy django template
+        "password2": "P@ss!word1234",
+    }, follow=True)
+
+    user = User.objects.filter(username="user_1").first()
+
+    print(user.groups.all())
+    assert user.groups.filter(name="new_hire_permissions").exists()
