@@ -430,3 +430,20 @@ def test_user_login_view_4(client):
     assert response.status_code == 200 # pozostajemy na stronie, nie ma przekierowania
     error_message = "Please enter a correct username and password. Note that both fields may be case-sensitive."
     assert error_message in response.content.decode() # uzyskanie dostępu do kodu html (pełna treść) w str
+
+@pytest.mark.django_db
+def test_user_logout_view(client, django_user_model):
+    # sprawdzamy czy użytkownik zostanie poprawnie przekierowoany po wylogowaniu
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True) # musimy użyc follow=, żeby sprawdzić czy użytkownik faktycznie został przekierowny po zalogowaniu
+
+    assert response.status_code == 200 #status po przekierowaniu
+    assert response.request["PATH_INFO"] == reverse("trial_balance") # czy użytkownik został poprawnie przekierowany na trail_balance
+
+    url = reverse("user_logout")
+    response = client.post(url, follow=True) #LogoutView działa na post
+
+    assert response.status_code == 200 #status po przekierowaniu
+    assert response.request["PATH_INFO"] == reverse("first_hello") # czy użytkownik został poprawnie przekierowany na trail_balance

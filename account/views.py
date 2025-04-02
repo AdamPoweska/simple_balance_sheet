@@ -25,8 +25,9 @@ class UserLoginView(LoginView):
 
 
 class UserLogoutView(LogoutView):
-    redirect_authenticated_user = True
-    success_url = 'first_hello'
+    next_page = reverse_lazy('first_hello')
+    # redirect_authenticated_user = True
+    # success_url = 'first_hello'
 
 
 class UserRegisterView(FormView):
