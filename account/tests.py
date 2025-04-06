@@ -496,3 +496,21 @@ def test_user_register_view_3(client):
 
     print(user.groups.all())
     assert user.groups.filter(name="new_hire_permissions").exists()
+
+@pytest.mark.django_db
+def test_account_create_view_1(client, django_user_model):
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True)
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprwane zalogowanie na trial balance
+
+    # przejście do opcji add account
+    url = reverse("user_form")
+    response = client.get(url)
+    assert response.status_code == 403 # odmowa dostępu
+    status_message = "Please contact administrator if access should be added."
+    assert status_message in response.content.decode()
