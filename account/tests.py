@@ -1,5 +1,5 @@
 import pytest
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.urls import reverse
 
 from .models import SimpleTrialBalance
@@ -514,3 +514,25 @@ def test_account_create_view_1(client, django_user_model):
     assert response.status_code == 403 # odmowa dostępu
     status_message = "Please contact administrator if access should be added."
     assert status_message in response.content.decode()
+
+@pytest.mark.django_db
+def test_account_create_view_2(client, django_user_model):
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True)
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprwane zalogowanie na trial balance
+
+    # przejście do opcji add account
+    url = reverse("user_form")
+    response = client.get(url, follow=True)
+    assert response.status_code == 200 # przejście na stronę
+    # assert response.request["PATH_INFO"] == reverse("trial_balance")
+    # status_message = "Please contact administrator if access should be added."
+    # assert status_message in response.content.decode()
