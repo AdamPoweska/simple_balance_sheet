@@ -160,3 +160,45 @@ def test_account_create_view_2(client, django_user_model):
     # assert response.request["PATH_INFO"] == reverse("trial_balance")
     # status_message = "Please contact administrator if access should be added."
     # assert status_message in response.content.decode()
+
+@pytest.mark.django_db
+def test_account_create_view_3(client, django_user_model):
+    '''
+    Próba zalogowania z błędnym hasłem.
+    '''
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw5555"}, follow=True) # błędne hasło
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("login") #poprwane zalogowanie na trial balance
+
+    assert response.status_code == 200 # odmowa dostępu
+    status_message = "Forgot password?"
+    assert status_message in response.content.decode()
+
+@pytest.mark.django_db
+def test_account_create_view_4(client, django_user_model):
+    '''
+    Próba zalogowania z błędnym loginem.
+    '''
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_xyz", "password": "pw1234"}, follow=True) # błędny login
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("login") #poprwane zalogowanie na trial balance
+
+    assert response.status_code == 200 # odmowa dostępu
+    status_message = "Forgot password?"
+    assert status_message in response.content.decode()
