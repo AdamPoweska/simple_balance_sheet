@@ -224,3 +224,117 @@ def test_account_create_view_3(client, django_user_model):
     # assert response.request["PATH_INFO"] == reverse("trial_balance")
     # status_message = "Please contact administrator if access should be added."
     # assert status_message in response.content.decode()
+
+@pytest.mark.django_db
+def test_account_create_view_4(client, django_user_model):
+    '''
+    Poprawne przejście na user form - bez wybranych opcji.
+    '''
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True)
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprawne zalogowanie na trial balance
+
+    # przejście na user_form - dostępne opcje 
+    url = reverse("user_form")
+    response = client.get(url)
+    assert response.status_code == 200 # przejście na stronę
+    assert response.request["PATH_INFO"] == reverse("user_form")
+
+@pytest.mark.django_db
+def test_account_create_view_5(client, django_user_model):
+    '''
+    Poprawne przejście na user form - opcja "Add account".
+    '''
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {"username": "user_1", "password": "pw1234"}, follow=True)
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprawne zalogowanie na trial balance
+
+    # przejście na user_form - dostępne opcje 
+    url = reverse("user_form")
+    response = client.post(reverse("user_form"), {
+        'name': 'Add account', 
+        'class': 'AccountCreateView',
+    }, follow=True)
+
+    assert response.status_code == 200 # przejście na stronę
+    assert response.request["PATH_INFO"] == reverse("user_form")
+
+    # upewniamy się że w htmlu jest "FORM:" - obecne tylko w tej templatce
+    status_message = "FORM:"
+    assert status_message in response.content.decode()
+
+@pytest.mark.django_db
+def test_account_create_view_6(client, django_user_model):
+    '''
+    Poprawne przejście na user form - opcja "Add account".
+    '''
+    # stworzenie użytkownika
+    user = django_user_model.objects.create_user(username="user_1", password="pw1234")
+    # dodanie go do grupy
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+    user.groups.add(group)
+
+    # zalogowanie
+    url = reverse("login")
+    response = client.post(url, {
+        "username": "user_1", 
+        "password": "pw1234"
+    }, follow=True)
+
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprawne zalogowanie na trial balance
+
+    # przejście na user_form - wybranie opcji AccountCreateView 
+    url = reverse("user_form")
+    response = client.post(reverse("user_form"), {
+        'name': 'Add account', 
+        'class': 'AccountCreateView',
+    }, follow=True)
+
+    assert response.status_code == 200 # przejście na stronę
+    assert response.request["PATH_INFO"] == reverse("user_form")
+
+    # upewniamy się że w htmlu jest "FORM:" - obecne tylko w tej templatce
+    status_message = "FORM:"
+    assert status_message in response.content.decode()
+
+    response = client.post(reverse("user_form"), {
+        "account_name": "account_1",
+        "account_number": "30011",
+        "opening_balance": 0,
+        "activity": 100,
+    }, follow=True)
+
+    
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance")
+
+    # upewniamy się że w htmlu jest "Simple Trial Balance" - poprawny powrót na stronę główną
+    status_message = "Simple Trial Balance"
+    assert status_message in response.content.decode()
+
+    # upewniamy się, że konto zostało poprawnie stworzone
+    db_contents = str(SimpleTrialBalance.objects.all())
+    new_account = "[account_1 | 30011 | 0 | 100 | 100]"
+    assert new_account in db_contents
+
+
+
+
+
