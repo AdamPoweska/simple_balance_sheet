@@ -7,34 +7,50 @@ from account.forms import *
 
 # Model tests:
 @pytest.mark.django_db
-def test_trial_balance_1():
+def test_trial_balance_1():    
+    account_name_var="GenLedgAcct"
+    account_number_var=1234
+    opening_balance_var=100
+    activity_var=10
+
     trial_balance = SimpleTrialBalance.objects.create(
-        account_name="GenLedgAcct",
-        account_number=1234,
-        opening_balance=100,
-        activity=10,
+        account_name=account_name_var,
+        account_number=account_number_var,
+        opening_balance=opening_balance_var,
+        activity=activity_var,
     )
 
-    assert str(trial_balance) == "GenLedgAcct | 1234"
+    assert str(trial_balance) == f"{account_name_var} | {account_number_var}"
 
 @pytest.mark.django_db
 def test_trial_balance_2():
+    account_name_var="GenLedgAcct"
+    account_number_var=1234
+    opening_balance_var=100
+    activity_var=10
+
     trial_balance = SimpleTrialBalance.objects.create(
-        account_name="GenLedgAcct",
-        account_number=1234,
-        opening_balance=100,
-        activity=10,
+        account_name=account_name_var,
+        account_number=account_number_var,
+        opening_balance=opening_balance_var,
+        activity=activity_var,
     )
 
-    assert trial_balance.closing_balance == 110
+    assert trial_balance.closing_balance == int(opening_balance_var) + int(activity_var)
 
 @pytest.mark.django_db
 def test_trial_balance_3():
-    trial_balance = SimpleTrialBalance.objects.create(
-        account_name="GenLedgAcct",
-        account_number=1234,
-        opening_balance=100,
-        activity=10,
-    )
+    account_name_var="GenLedgAcct"
+    account_number_var=1234
+    opening_balance_var=100
+    activity_var=10
 
-    assert repr(trial_balance) == "GenLedgAcct | 1234 | 100 | 10 | 110"
+    trial_balance = SimpleTrialBalance.objects.create(
+        account_name=account_name_var,
+        account_number=account_number_var,
+        opening_balance=opening_balance_var,
+        activity=activity_var,
+    )
+    
+    activity_total = int(opening_balance_var) + int(activity_var)
+    assert repr(trial_balance) == f"{account_name_var} | {account_number_var} | {opening_balance_var} | {activity_var} | {activity_total}"
