@@ -5,6 +5,25 @@ from django.urls import reverse
 from account.models import SimpleTrialBalance
 from account.forms import *
 
+# User with all accessess
+@pytest.fixture
+def user_all_permissions(django_user_model):
+    user = django_user_model.objects.create_user(username="user_all_perm", password="pw1234")
+    group, _ = Group.objects.get_or_create(name="all_permissions")
+
+    perms = Permission.objects.all()
+    group.permissions.set(perms)
+
+    user.groups.add(group)
+
+    return user
+
+# User with basic accessess
+@pytest.fixture
+def user_basic_permissions(django_user_model):
+    user = django_user_model.objects.create_user(username="user_basic_perm", password="pw5678")
+    return user
+
 # Testy widoków
 @pytest.mark.django_db
 def test_first_hello(client): # client to specjalne narzędzie do testowania widoków: 'do symulowania żądań HTTP'
@@ -282,8 +301,14 @@ def test_account_create_view_5(client, django_user_model):
 @pytest.mark.django_db
 def test_account_create_view_6(client, django_user_model):
     '''
+    Testowanie pełnego workflow.
+    Użytkownik z wszystkimi uprawnieniami.
     Poprawne przejście na user form - opcja "Add account".
+    Dodanie nowego konta.
+    Przejście na widok SimpleTrialBalance.
+    Upewnienie się, że konto zostało poprawnie zapisane.
     '''
+
     # stworzenie użytkownika
     user = django_user_model.objects.create_user(username="user_1", password="pw1234")
     # dodanie go do grupy
@@ -321,11 +346,10 @@ def test_account_create_view_6(client, django_user_model):
         "activity": 100,
     }, follow=True)
 
-    
     assert response.status_code == 200
     assert response.request["PATH_INFO"] == reverse("trial_balance")
 
-    # upewniamy się że w htmlu jest "Simple Trial Balance" - poprawny powrót na stronę główną
+    # upewniamy się że w htmlu jest "Simple Trial Balance" - oznacza to poprawny powrót na stronę główną
     status_message = "Simple Trial Balance"
     assert status_message in response.content.decode()
 
@@ -333,6 +357,51 @@ def test_account_create_view_6(client, django_user_model):
     db_contents = str(SimpleTrialBalance.objects.all())
     new_account = "[account_1 | 30011 | 0 | 100 | 100]"
     assert new_account in db_contents
+
+@pytest.mark.django_db
+def test_account_create_view_7(client, django_user_model, user_all_permissions):
+    # zalogowanie użytkownika do trial balance
+    # client.login(username="user_all_perm", password="pw1234")
+    client.force_login(user_all_permissions)
+
+    url = reverse("trial_balance")
+    response = client.get(url, follow=True)
+
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance") #poprawne zalogowanie na trial balance
+
+@pytest.mark.django_db
+def test_account_create_view_8(client, django_user_model, user_all_permissions):
+    # zalogowanie użytkownika do form - dodawanie konta
+    client.force_login(user_all_permissions)
+
+    url = reverse("user_form")
+    response = client.get(url, follow=True)
+
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("user_form") #poprawne zalogowanie na user_form
+
+@pytest.mark.django_db
+def test_account_create_view_9(client, django_user_model, user_all_permissions):
+    """
+    Sprawdzamy czy poprawnie dodajemy konto
+    """
+    client.force_login(user_all_permissions)
+
+    client.post(reverse("user_form"), {
+        "account_name": "account_1",
+        "account_number": "30011",
+        "opening_balance": 0,
+        "activity": 100,
+    }, follow=True)
+
+    response = client.get(reverse("trial_balance"))
+    assert "Simple Trial Balance" in response.content.decode()
+
+    db_contents = str(SimpleTrialBalance.objects.all())
+    new_account = "[account_1 | 30011 | 0 | 100 | 100]"
+    assert new_account in db_contents
+
 
 
 
