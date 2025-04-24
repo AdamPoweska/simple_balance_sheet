@@ -382,7 +382,7 @@ def test_account_create_view_8(client, django_user_model, user_all_permissions):
     assert response.request["PATH_INFO"] == reverse("user_form") #poprawne zalogowanie na user_form
 
 @pytest.mark.django_db
-def test_account_create_view_9(client, django_user_model, user_all_permissions):
+def test_account_create_view_9(client, user_all_permissions):
     """
     Sprawdzamy czy poprawnie dodajemy konto
     """
@@ -402,8 +402,62 @@ def test_account_create_view_9(client, django_user_model, user_all_permissions):
     new_account = "[account_1 | 30011 | 0 | 100 | 100]"
     assert new_account in db_contents
 
+@pytest.mark.django_db
+def test_account_delete(client, user_all_permissions):
+    """
+    Testujemy usuwanie konta.
+    """
+    client.force_login(user_all_permissions)
 
+    #tworzymy dwa konta
+    account1 = SimpleTrialBalance.objects.create(account_name="account1", account_number=100100, opening_balance=0, activity=0)
+    account2 = SimpleTrialBalance.objects.create(account_name="account2", account_number=200200, opening_balance=0, activity=0)
 
+    # wyświetlenie delete_account
+    response = client.get(reverse("delete_account"))
+    assert response.status_code == 200
+    assert "Select accounts to delete" in response.content.decode()
 
+    # usunięcie jednego z kont
+    response = client.post(reverse("delete_account"), {
+        "accounts_to_delete": [account1.id] 
+    }, follow=True)
 
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance")
 
+    # czy konto_1 jest usunięte a konto_2 nadal istnieje
+    accounts = SimpleTrialBalance.objects.all()
+    assert account1 not in accounts
+    assert account2 in accounts
+
+@pytest.mark.django_db
+def test_account_update(client, user_all_permissions):
+    """
+    Testujemy zmienianie konta.
+    """
+    client.force_login(user_all_permissions)
+
+    #tworzymy konto
+    account1 = SimpleTrialBalance.objects.create(account_name="account1", account_number=100100, opening_balance=0, activity=0)
+    
+    # wyświetlenie update_account
+    update_account = reverse("update_account", args=[account1.id])
+    response = client.get(update_account)
+    assert response.status_code == 200
+    assert "Update account:" in response.content.decode()
+
+    # wprowadzamy zmiany w koncie
+    response = client.post((update_account), {
+        "account_name": account1.account_name,
+        "account_number": account1.account_number,
+        "opening_balance": account1.opening_balance,
+        "activity": 100, # zmieniamy tylko activity
+    }, follow=True)
+
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("trial_balance")
+
+    db_contents = str(SimpleTrialBalance.objects.all())
+    new_account = "[account1 | 100100 | 0 | 100 | 100]"
+    assert new_account in db_contents
