@@ -5,7 +5,7 @@ from django.urls import reverse
 from account.models import SimpleTrialBalance
 from account.forms import *
 
-# Model tests:
+
 @pytest.mark.django_db
 def test_trial_balance_1():    
     account_name_var="GenLedgAcct"

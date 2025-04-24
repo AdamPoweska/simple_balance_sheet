@@ -5,7 +5,7 @@ from django.urls import reverse
 from account.models import SimpleTrialBalance
 from account.forms import *
 
-# forms tests:
+
 @pytest.mark.django_db
 def test_new_user():
     form_data = {
@@ -30,7 +30,7 @@ def test_trial_balance_form_1():
 
 @pytest.mark.django_db
 def test_trial_balance_form_2():
-    # nowy yżytkonik
+    # nowy użytkownik
     user = User.objects.create_user(username="testuser_1", password="password_1")
 
     # nadanie użytkownikowi accessu z new_hire_perm:

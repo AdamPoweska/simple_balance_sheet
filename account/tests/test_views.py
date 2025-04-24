@@ -15,10 +15,9 @@ def user_all_permissions(django_user_model):
     group.permissions.set(perms)
 
     user.groups.add(group)
-
     return user
 
-# User with basic accessess
+# User with basic access
 @pytest.fixture
 def user_basic_permissions(django_user_model):
     user = django_user_model.objects.create_user(username="user_basic_perm", password="pw5678")
@@ -30,7 +29,7 @@ def test_first_hello(client): # client to specjalne narzędzie do testowania wid
     url = reverse("first_hello") #  reverse() zmienia nazwę widoku (taki jak jest w urls.py) na odpowiadający jej url, podajemy nazwę taka jaka jest w urls.py > name=
     response = client.get(url)
 
-    assert response.status_code == 200 # sprawdza czy strona się ładuje
+    assert response.status_code == 200 # Standard response for successful HTTP requests
     assert "first_hello.html" in [x.name for x in response.templates] # sprawdza czy szablon 'first_hello.html' - czyli czy używamy odpowiedniego szablonu
 
 @pytest.mark.django_db
@@ -50,7 +49,7 @@ def test_login_error_1(client, django_user_model):
     assert response.status_code == 200
     assert response.request["PATH_INFO"] == reverse("login") #poprwane zalogowanie na trial balance
 
-    assert response.status_code == 200 # odmowa dostępu
+    assert response.status_code == 200
     status_message = "Forgot password?"
     assert status_message in response.content.decode()
 
@@ -240,9 +239,6 @@ def test_account_create_view_3(client, django_user_model):
     url = reverse("user_form")
     response = client.get(url, follow=True)
     assert response.status_code == 200 # przejście na stronę
-    # assert response.request["PATH_INFO"] == reverse("trial_balance")
-    # status_message = "Please contact administrator if access should be added."
-    # assert status_message in response.content.decode()
 
 @pytest.mark.django_db
 def test_account_create_view_4(client, django_user_model):
@@ -359,9 +355,8 @@ def test_account_create_view_6(client, django_user_model):
     assert new_account in db_contents
 
 @pytest.mark.django_db
-def test_account_create_view_7(client, django_user_model, user_all_permissions):
+def test_account_create_view_7(client, user_all_permissions):
     # zalogowanie użytkownika do trial balance
-    # client.login(username="user_all_perm", password="pw1234")
     client.force_login(user_all_permissions)
 
     url = reverse("trial_balance")
@@ -371,7 +366,7 @@ def test_account_create_view_7(client, django_user_model, user_all_permissions):
     assert response.request["PATH_INFO"] == reverse("trial_balance") #poprawne zalogowanie na trial balance
 
 @pytest.mark.django_db
-def test_account_create_view_8(client, django_user_model, user_all_permissions):
+def test_account_create_view_8(client, user_all_permissions):
     # zalogowanie użytkownika do form - dodawanie konta
     client.force_login(user_all_permissions)
 
@@ -434,7 +429,7 @@ def test_account_delete(client, user_all_permissions):
 @pytest.mark.django_db
 def test_account_update(client, user_all_permissions):
     """
-    Testujemy zmienianie konta.
+    Testujemy wprowadzanie zmian na koncie.
     """
     client.force_login(user_all_permissions)
 
@@ -447,12 +442,12 @@ def test_account_update(client, user_all_permissions):
     assert response.status_code == 200
     assert "Update account:" in response.content.decode()
 
-    # wprowadzamy zmiany w koncie
+    # zmiany w koncie
     response = client.post((update_account), {
         "account_name": account1.account_name,
         "account_number": account1.account_number,
         "opening_balance": account1.opening_balance,
-        "activity": 100, # zmieniamy tylko activity
+        "activity": 100, # zmieniam tylko activity
     }, follow=True)
 
     assert response.status_code == 200
